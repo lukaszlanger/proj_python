@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raporty bezdomności</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    
+
+    <style>
+#reloadButton {
+      padding-left: 24px;
+    padding-right: 24px;
+    padding-top:4px;
+    padding-bottom:4px;
+}
+
+#navbar {
+  overflow: hidden;
+  background-color: #333;
+}
+
+#logout {
+  float: right;
+  border-style: ridge;
+}
+
+#logged{
+float:left
+}
+
+#navbar a {
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px;
+  text-decoration: none;
+}
+#chartsContainer{
+width:100%;
+height:100%;
+}
+
+#title{
+font-size: 25px;
+}
+
+.content {
+  padding: 16px;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.sticky + .content {
+  padding-top: 60px;
+}
+.dropbtn {
+  color: black;
+  padding-left: 24px;
+    padding-right: 24px;
+    padding-top:4px;
+    padding-bottom:4px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+#secondRow{
+background:black;
+width:100px;
+}
+
+.dropdown-content a:hover {background-color: #f1f1f1;}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+
+
+
+
+
+body {
+      display: flex;
+    }
+
+
+    #content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    #navbar {
+      margin-top: 0px;
+    }
+
+    .chart-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .chart-card {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      width: 900px;
+      margin: 10px;
+    }
+
+    .chart-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    #sidebar {
+    background-color: #f1f1f1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    padding: 10px;
+  }
+
+  #sidebar form {
+    margin-bottom: auto;
+  }
+
+  #sidebar .mt-3 {
+    margin-top: 3rem;
+  }
+    </style>
+</head>
+
+<body>
+  <div id="sidebar" class="d-flex flex-column align-items-center">
+    <form method="post">
+      <div class="mb-3">
+        <label for="fromYear" class="form-label">Start year:</label>
+        <select class="form-select" id="fromYear" name="fromYear">
+          <option value="2020">2020</option>
+          <option value="2019" selected>2019</option>
+          <option value="2018">2018</option>
+          <option value="2017">2017</option>
+          <option value="2016">2016</option>
+          <option value="2015">2015</option>
+          <option value="2014">2014</option>
+          <option value="2013">2013</option>
+          <option value="2012">2012</option>
+          <option value="2011">2011</option>
+          <option value="2010">2010</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="toYear" class="form-label">End year:</label>
+        <select class="form-select" id="toYear" name="toYear">
+          <option value="2021" selected>2021</option>
+          <option value="2020">2020</option>
+          <option value="2019">2019</option>
+          <option value="2018">2018</option>
+          <option value="2017">2017</option>
+          <option value="2016">2016</option>
+          <option value="2015">2015</option>
+          <option value="2014">2014</option>
+          <option value="2013">2013</option>
+          <option value="2012">2012</option>
+          <option value="2011">2011</option>
+          <option value="2010">2010</option>
+        </select>
+      </div>
+      <button type="submit" class="btn"><img src="https://img.icons8.com/?size=512&id=m8gRP2AQ4AOX&format=png" width="30px" height="30px"></button>
+    </form>
+    
+    <div class="d-flex flex-column align-items-center">
+      <div class="mt-3">Użytkownik: {{ user | safe }}</div>
+      <div class="mt-3">
+        <a id="logout" href="{{url_for('logout')}}" style="border: none;">
+          <img src="https://img.icons8.com/?size=512&id=13925&format=png" width="30px" height="30px">
+        </a>
+      </div>
+    </div>
+    
+    
+    
+    
+    
+    
+  </div>
+  
+  
+  
+  
+
+  <div id="content">
+    <div id="navbar">
+      <a id="title">Raport o stanie cen nieruchomości</a>
+    </div>
+
+
+<div class="chart-container">
+  <div class="chart-card">
+      <div class="chart-content">
+          <canvas width="800" height="400" id="lineChart"></canvas>
+      </div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-card">
+      <div class="chart-content">
+          <canvas width="800" height="400" id="barChart"></canvas>
+      </div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-card">
+      <div class="chart-content">
+          <canvas width="800" height="400" id="flatPricesChart"></canvas>
+      </div>
+  </div>
+</div>
+
+<div class="chart-container">
+  <div class="chart-card">
+      <div class="chart-content">
+          <canvas width="800" height="400" id="flatPricesPointerChart"></canvas>
+      </div>
+  </div>
+</div>
+</div>
+<script>
+const lineChartData = {
+    labels: {{ labelsForAveragePriceForM2 | safe }},
+    datasets: [{
+      label: "Średnia cena za 1 m2 lokali mieszkalnych",
+      data: {{ valuesForAveragePriceForM2 | safe }},
+      fill: false,
+      lineTension: 0.1,
+      borderColor: "rgb(75,192,192)",
+    }]
+  };
+
+  const lineChartConfig = {
+    type: 'line',
+    data: lineChartData,
+    options: {
+     responsive: false}
+  };
+
+  const lineChart = new Chart(
+    document.getElementById('lineChart'),
+    lineChartConfig
+  );
+
+
+
+
+  const barChartData = {
+    labels: {{ labelsForMedianPriceForM2 | safe }},
+    datasets: [{
+      label: "Mediana cen za 1 m2 lokali mieszkalnych",
+      data: {{ valuesForMedianPriceForM2 | safe }},
+      fill: false,
+      lineTension: 0.1,
+      borderColor: "rgb(75,192,192)",
+    }]
+  };
+
+  const barChartconfig = {
+    type: 'bar',
+    data: barChartData,
+    options: {
+     responsive: false}
+  };
+
+  const barChart = new Chart(
+    document.getElementById('barChart'),
+    barChartconfig
+  );
+
+
+
+   const flatPricesChartData = {
+    labels: {{ labelsForAveragePriceFlat | safe }},
+    datasets: [{
+      label: "Średnia cena lokalu mieszkalnego",
+      data: {{ valuesForAveragePriceFlat | safe }},
+      fill: true,
+      lineTension: 0.1,
+      borderColor: "rgb(75,192,192)",
+    }]
+  };
+
+  const flatPricesChartconfig = {
+    type: 'bar',
+    data: flatPricesChartData,
+    options: {
+     responsive: false}
+  };
+
+  const flatPricesPointerChart = new Chart(
+    document.getElementById('flatPricesChart'),
+    flatPricesChartconfig
+  );
+
+
+const ctx = document.getElementById('flatPricesPointerChart');
+
+const myChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels:  {{ labelsForAverageFlatPricesPointer | safe }},
+    datasets: [{
+      label: "Wskaźniki cen lokali mieszkalnych",
+      data: {{ valuesForAverageFlatPricesPointer | safe }},
+      fill: true,
+      borderWidth: 1,
+    }]
+  },
+  options: {
+     responsive: false},
+});
+
+</script>
+</body>
+</html>
