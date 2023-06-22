@@ -1,53 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strona logowania</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
   <style>
-    #loginForm{
-    margin-left:35%;
-    margin-top:10%;
-    background-color:#4d4d4d
-;
-    text-align: center;
-    width:30%;
-    padding-top:5%;
-    padding-bottom:5%;
+    body {
+      display: flex;
+      background-color: #E8E6E9;
     }
-    body{
-    background-color: #333;
+
+    .btn-grad {
+      background-image: linear-gradient(to right, #4BC0C0 0%, #001510 81%, #4BC0C0 100%);
+      margin-bottom: 10px;
+      text-align: center;
+      align-items: center;
+      transition: 0.5s;
+      background-size: 200% auto;
+      color: white;
+      border-radius: 12px;
+      border: 0;
+    }
+
+    .btn-grad:hover {
+      background-position: right center;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .title {
+      display: block;
+      color: #f2f2f2;
+      text-align: center;
+      padding: 14px;
+      text-decoration: none;
+      font-size: 50px;
+    }
+
+    .login_div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      background-color: #333;
+      width: 30%;
+      height: 60%;
+      align-items: center;
+      text-align: center;
+      border-radius: 15px;
+      justify-content: center;
+      display: flex;
+      flex-direction: column;
     }
   </style>
 </head>
 
 <body>
-<div id="loginForm">
-    <h1 style="color:white; font-size:50px;">Login Page</h1>
+  <div class="login_div">
+    <h1 class="title">Zaloguj się</h1>
 
-    <form method="POST" action="" >
-        {{ form.hidden_tag() }}
+    <form method="POST" action="">
+      {{ form.hidden_tag() }}
       <div style="padding-bottom:3px;">
-        {{ form.username }}
+        {{ form.username(class_="form-control") }}
       </div>
       </br>
       <div style="padding-bottom:3px;">
-        {{ form.password }}
+        {{ form.password(class_="form-control") }}
       </div>
-            </br>
- <div style="padding-bottom:3px;">
-        {{ form.submit }}
-         </div>
+      </br>
+      <div style="padding-bottom:3px;">
+        {{ form.submit(class_="btn btn-grad") }}
+      </div>
 
     </form>
- <div style="padding-bottom:7px;">
-    <a href="{{ url_for('register') }}" style="color:white;">Don't have an account? Sign Up</a>
-   </div>
+    <div style="padding-bottom:7px;">
+      <a href="{{ url_for('register') }}" style="color:white; text-decoration: none;">Zarejestruj nowe konto</a>
+    </div>
   </div>
 </body>
 
 </html>
-
-

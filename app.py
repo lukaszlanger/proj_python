@@ -5,7 +5,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
-from flask_bootstrap import Bootstrap
 import requests
 from flask import request
 
@@ -33,29 +32,29 @@ class User(db.Model, UserMixin):
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Nazwa użytkownika"})
 
     password = PasswordField(validators=[
-        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Hasło"})
 
-    submit = SubmitField('Register')
+    submit = SubmitField('Zarejestruj')
 
     def validate_username(self, username):
         existing_user_username = User.query.filter_by(
             username=username.data).first()
         if existing_user_username:
             raise ValidationError(
-                'That username already exists. Please choose a different one.')
+                'Taki użytkownik istnieje. Wybierz inną nazwę')
 
 
 class LoginForm(FlaskForm):
     username = StringField(validators=[
-        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+        InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Nazwa użytkownika"})
 
     password = PasswordField(validators=[
-        InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+        InputRequired(), Length(min=6, max=20)], render_kw={"placeholder": "Hasło"})
 
-    submit = SubmitField('Login')
+    submit = SubmitField('Zaloguj')
 
 
 class ApiData(FlaskForm):
@@ -82,13 +81,7 @@ class ApiData(FlaskForm):
                                            'averagePrice': round(valueSum / countOfValuesDefferentThanZero)})
         return testPeroidAndPrice
 
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -96,15 +89,15 @@ def login():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('home'))
     return render_template('login.html', form=form)
 
 
 
 
-@app.route('/dashboard', methods =["GET", "POST"])
+@app.route('/home', methods =["GET", "POST"])
 @login_required
-def dashboard():
+def home():
     if request.method == "POST":
         fromYear = request.form['fromYear']
         toYear = request.form['toYear']
@@ -141,7 +134,7 @@ def dashboard():
         labelsForAverageFlatPricesPointer.append(x["date"])
         valuesForAverageFlatPricesPointer.append(x["averagePrice"])
 
-    return render_template('dashboard.html',
+    return render_template('home.html',
                            labelsForAveragePriceForM2=labelsForAveragePriceForM2,
                            valuesForAveragePriceForM2=valuesForAveragePriceForM2,
                            labelsForMedianPriceForM2=labelsForMedianPriceForM2,
