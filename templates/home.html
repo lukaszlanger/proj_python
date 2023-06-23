@@ -1,352 +1,394 @@
 <!DOCTYPE html>
 <html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bezrobocie</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css"
+    />
+    <style>
+      body {
+        display: flex;
+        background-color: #e8e6e9;
+      }
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bezrobocie</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
-  <style>
-    body {
-      display: flex;
-      background-color: #E8E6E9;
-    }
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
 
-    .container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
+      .content {
+        flex: 1;
+        padding: 0px;
+        margin: 0;
+        margin-top: 10px;
+        margin-left: 250px;
+      }
 
-    .content {
-      flex: 1;
-      padding: 0px;
-      margin: 0;
-      margin-top: 10px;
-      margin-left: 250px;
-    }
+      .chart-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-    .chart-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+      .chart-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 15px;
+        overflow: hidden;
+        width: 900px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        background-color: white;
+      }
 
-    .chart-card {
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      border-radius: 15px;
-      overflow: hidden;
-      width: 900px;
-      padding-top: 20px;
-      padding-bottom: 20px;
-      background-color: white;
-    }
+      .chart-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
 
-    .chart-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
+      .sidebar {
+        background-color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 300px;
+        padding: 10px;
+        box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
 
-    .sidebar {
-      background-color: white;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 300px;
-      padding: 10px;
-      box-shadow: 4px 0px 6px rgba(0, 0, 0, 0.1);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+      .sidebar_container form {
+        margin-bottom: auto;
+      }
 
-    .sidebar_container form {
-      margin-bottom: auto;
-    }
+      .sidebar .mt-3 {
+        margin-top: 3rem;
+      }
 
-    .sidebar .mt-3 {
-      margin-top: 3rem;
-    }
+      .sidebar_container {
+        padding: 10px;
+        border-radius: 15px;
+        background-color: #e8e6e9;
+        width: 100%;
+        margin-bottom: 20px;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.315);
+      }
 
-    .sidebar_container {
-      padding: 10px;
-      border-radius: 15px;
-      background-color: #E8E6E9;
-      width: 100%;
-      margin-bottom: 20px;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.315);
-    }
+      .logout_container {
+        border-radius: 15px;
+        background-color: #e8e6e9;
+        width: 100%;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.315);
+        margin-top: auto;
+      }
 
-    .logout_container {
-      border-radius: 15px;
-      background-color: #E8E6E9;
-      width: 100%;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.315);
-      margin-top: auto;
-    }
+      .titlebar {
+        overflow: hidden;
+        background-color: #333;
+        margin-top: 10px;
+        border-radius: 15px;
+        margin-left: 250px;
+        width: 900px;
+        padding: 0px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.209);
+      }
 
-    .titlebar {
-      overflow: hidden;
-      background-color: #333;
-      margin-top: 10px;
-      border-radius: 15px;
-      margin-left: 250px;
-      width: 900px;
-      padding: 0px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.209);
-    }
+      .btn-grad {
+        background-image: linear-gradient(
+          to right,
+          #4bc0c0 0%,
+          #001510 81%,
+          #4bc0c0 100%
+        );
+        margin-bottom: 10px;
+        text-align: center;
+        align-items: center;
+        transition: 0.5s;
+        background-size: 200% auto;
+        color: white;
+        box-shadow: 0 0 20px #eee;
+        border-radius: 12px;
+      }
 
-    .btn-grad {
-      background-image: linear-gradient(to right, #4BC0C0 0%, #001510 81%, #4BC0C0 100%);
-      margin-bottom: 10px;
-      text-align: center;
-      align-items: center;
-      transition: 0.5s;
-      background-size: 200% auto;
-      color: white;
-      box-shadow: 0 0 20px #eee;
-      border-radius: 12px;
-    }
+      .btn-grad:hover {
+        background-position: right center;
+        color: #fff;
+        text-decoration: none;
+      }
 
-    .btn-grad:hover {
-      background-position: right center;
-      color: #fff;
-      text-decoration: none;
-    }
+      .title {
+        display: block;
+        color: #f2f2f2;
+        text-align: center;
+        padding: 14px;
+        text-decoration: none;
+        font-size: 25px;
+      }
+    </style>
+  </head>
 
-    .title {
-      display: block;
-      color: #f2f2f2;
-      text-align: center;
-      padding: 14px;
-      text-decoration: none;
-      font-size: 25px;
-    }
-  </style>
-</head>
+  <body>
+    <div class="container">
+      <div class="sidebar d-flex flex-column align-items-center">
+        <div
+          class="sidebar_container title"
+          style="background-color: #333; margin-bottom: 30px"
+        >
+          Wykresy
+        </div>
 
-<body>
-  <div class="container">
-    <div class="sidebar d-flex flex-column align-items-center">
-      <div class="sidebar_container title" style="background-color: #333; margin-bottom: 30px;">
-        Wykresy
-      </div>
-
-      <div class="sidebar_container">
-        <form method="post">
-          <div class="mb-3">
-            <label for="fromYear" class="form-label">Data początkowa danych:</label>
-            <select class="form-select" id="fromYear" name="fromYear">
-              <option value="2020">2020</option>
-              <option value="2019" selected>2019</option>
-              <option value="2018">2018</option>
-              <option value="2017">2017</option>
-              <option value="2016">2016</option>
-              <option value="2015">2015</option>
-              <option value="2014">2014</option>
-              <option value="2013">2013</option>
-              <option value="2012">2012</option>
-              <option value="2011">2011</option>
-              <option value="2010">2010</option>
-            </select>
-          </div>
-          <div class="mb-3">
-            <label for="toYear" class="form-label">Data końcowa danych:</label>
-            <select class="form-select" id="toYear" name="toYear">
-              <option value="2021" selected>2021</option>
-              <option value="2020">2020</option>
-              <option value="2019">2019</option>
-              <option value="2018">2018</option>
-              <option value="2017">2017</option>
-              <option value="2016">2016</option>
-              <option value="2015">2015</option>
-              <option value="2014">2014</option>
-              <option value="2013">2013</option>
-              <option value="2012">2012</option>
-              <option value="2011">2011</option>
-              <option value="2010">2010</option>
-            </select>
-          </div>
-          <button type="submit" class="btn btn-grad flex-column align-items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0,0,256,256"
-              style="fill:#000000;">
-              <g fill="#ffffff" fill-rule="nonzero" stroke="none" stroke-width="1" stroke-linecap="butt"
-                stroke-linejoin="miter" stroke-miterlimit="10" stroke-dasharray="" stroke-dashoffset="0"
-                font-family="none" font-weight="none" font-size="none" text-anchor="none"
-                style="mix-blend-mode: normal">
-                <g transform="scale(5.12,5.12)">
-                  <path
-                    d="M20,4c-5.49219,0 -10,4.50781 -10,10v17.75l-2.875,-2.875l-2.8125,2.84375l7.6875,7.6875l7.6875,-7.6875l-2.8125,-2.8125l-2.875,2.84375v-17.75c0,-3.30859 2.69141,-6 6,-6h11v-4zM38,10.59375l-7.71875,7.71875l2.84375,2.8125l2.875,-2.875v17.75c0,3.30859 -2.69141,6 -6,6h-11v4h11c5.49219,0 10,-4.50781 10,-10v-17.75l2.875,2.875l2.8125,-2.84375z">
-                  </path>
+        <div class="sidebar_container">
+          <form method="post">
+            <div class="mb-3">
+              <label for="fromYear" class="form-label"
+                >Data początkowa danych:</label
+              >
+              <select class="form-select" id="fromYear" name="fromYear">
+                <option value="2020">2020</option>
+                <option value="2019" selected>2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+                <option value="2014">2014</option>
+                <option value="2013">2013</option>
+                <option value="2012">2012</option>
+                <option value="2011">2011</option>
+                <option value="2010">2010</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="toYear" class="form-label"
+                >Data końcowa danych:</label
+              >
+              <select class="form-select" id="toYear" name="toYear">
+                <option value="2021" selected>2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+                <option value="2018">2018</option>
+                <option value="2017">2017</option>
+                <option value="2016">2016</option>
+                <option value="2015">2015</option>
+                <option value="2014">2014</option>
+                <option value="2013">2013</option>
+                <option value="2012">2012</option>
+                <option value="2011">2011</option>
+                <option value="2010">2010</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="btn btn-grad flex-column align-items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                x="0px"
+                y="0px"
+                width="20"
+                height="20"
+                viewBox="0,0,256,256"
+                style="fill: #000000"
+              >
+                <g
+                  fill="#ffffff"
+                  fill-rule="nonzero"
+                  stroke="none"
+                  stroke-width="1"
+                  stroke-linecap="butt"
+                  stroke-linejoin="miter"
+                  stroke-miterlimit="10"
+                  stroke-dasharray=""
+                  stroke-dashoffset="0"
+                  font-family="none"
+                  font-weight="none"
+                  font-size="none"
+                  text-anchor="none"
+                  style="mix-blend-mode: normal"
+                >
+                  <g transform="scale(5.12,5.12)">
+                    <path
+                      d="M20,4c-5.49219,0 -10,4.50781 -10,10v17.75l-2.875,-2.875l-2.8125,2.84375l7.6875,7.6875l7.6875,-7.6875l-2.8125,-2.8125l-2.875,2.84375v-17.75c0,-3.30859 2.69141,-6 6,-6h11v-4zM38,10.59375l-7.71875,7.71875l2.84375,2.8125l2.875,-2.875v17.75c0,3.30859 -2.69141,6 -6,6h-11v4h11c5.49219,0 10,-4.50781 10,-10v-17.75l2.875,2.875l2.8125,-2.84375z"
+                    ></path>
+                  </g>
                 </g>
-              </g>
-            </svg>
-            Odśwież
-          </button>
-        </form>
+              </svg>
+              Odśwież
+            </button>
+          </form>
+        </div>
+
+        <div class="sidebar_container">
+          <b>Projekt wykonali:</b><br />
+          Łukasz Langer<br />
+          Mikołaj Glistak<br />
+          Piotr Pietrasik<br />
+        </div>
+
+        <div class="logout_container d-flex flex-column align-items-center">
+          <div class="mt-3"><b>Użytkownik:</b> {{ user | safe }}</div>
+          <div class="mt-3">
+            <div class="d-flex gap-2 mb-3 flex-column align-items-center">
+              <a id="logout" href="{{url_for('logout')}}" style="border: none">
+                <button type="button" class="btn btn-grad">
+                  <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAABhElEQVR4nO2ZTUrDQBiGQw+gpoqrKCj4d4lurD+n0I2eQd278AaKiB5EULQFEdSlV7D1Bi7MI8FJGQYsGr/50inzwCyyeb/3nSQzky9JEolEIsECzAMtoF1xtAqNOoyvAPfIcQcsa876O/L0gUwjwJVV9APoANcVR8dolFxoBChmqqQtoLdp6fVkXA4vmFsFGwJ6DUsvl3E5vOCAUdb8kRhgTO/ADLADvElp1jJbwIK0ptcAQGr2lTNgQsahboAjS+4BmJRxqRdgy9lXHoEpGadK7wCwD3xass9AU0JbcxXac0K8ANNS+pUCmPP+wR/Gk61trtNaAgBrzoxW5byuAKtBBygA1oFj4OSX43VkHiGhl7gppe81ACEvo8B20BsZcBj6USI1h7nTIA9zLsBi4htPq9AssKvVlfARQFxTtRgeNMc6QB56Y6tvFdwQ+iorUelKXA7KfTdmu/9o7nbraO7OOXdBip5Ke92EWAJuBc3fFJoq5p0gmcAvpkzdeCQSiSRSfAEe/GNDlGJX4gAAAABJRU5ErkJggg=="
+                    width="25"
+                    height="25"
+                  />
+                  Wyloguj
+                </button></a
+              >
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="sidebar_container">
-        <b>Projekt wykonali:</b><br>
-        Łukasz Langer<br>
-        Mikołaj Glistak<br>
-        Piotr Pietrasik<br>
+      <div class="titlebar">
+        <a class="title">Wykresy dot. bezrobocia w Polsce</a>
       </div>
+      <div class="content">
+        <div class="chart-container mt-4 mb-4">
+          <div class="chart-card">
+            <div class="chart-content">
+              <canvas width="800" height="400" id="lineChart"></canvas>
+            </div>
+          </div>
+        </div>
 
-      <div class="logout_container d-flex flex-column align-items-center">
-        <div class="mt-3"><b>Użytkownik:</b> {{ user | safe }}</div>
-        <div class="mt-3">
-          <div class="d-flex gap-2 mb-3 flex-column align-items-center">
-            <a id="logout" href="{{url_for('logout')}}" style="border: none">
-              <button type="button" class="btn btn-grad">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAABhElEQVR4nO2ZTUrDQBiGQw+gpoqrKCj4d4lurD+n0I2eQd278AaKiB5EULQFEdSlV7D1Bi7MI8FJGQYsGr/50inzwCyyeb/3nSQzky9JEolEIsECzAMtoF1xtAqNOoyvAPfIcQcsa876O/L0gUwjwJVV9APoANcVR8dolFxoBChmqqQtoLdp6fVkXA4vmFsFGwJ6DUsvl3E5vOCAUdb8kRhgTO/ADLADvElp1jJbwIK0ptcAQGr2lTNgQsahboAjS+4BmJRxqRdgy9lXHoEpGadK7wCwD3xass9AU0JbcxXac0K8ANNS+pUCmPP+wR/Gk61trtNaAgBrzoxW5byuAKtBBygA1oFj4OSX43VkHiGhl7gppe81ACEvo8B20BsZcBj6USI1h7nTIA9zLsBi4htPq9AssKvVlfARQFxTtRgeNMc6QB56Y6tvFdwQ+iorUelKXA7KfTdmu/9o7nbraO7OOXdBip5Ke92EWAJuBc3fFJoq5p0gmcAvpkzdeCQSiSRSfAEe/GNDlGJX4gAAAABJRU5ErkJggg=="
-                  width="25" height="25">
-                Wyloguj
-              </button></a>
+        <div class="chart-container mt-4 mb-4">
+          <div class="chart-card">
+            <div class="chart-content">
+              <canvas width="800" height="400" id="barChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-container mt-4 mb-4">
+          <div class="chart-card">
+            <div class="chart-content">
+              <canvas width="800" height="400" id="flatPricesChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="chart-container mt-4 mb-4">
+          <div class="chart-card">
+            <div class="chart-content">
+              <canvas
+                width="800"
+                height="400"
+                id="flatPricesPointerChart"
+              ></canvas>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="titlebar">
-      <a class="title">Wykresy dot. bezrobocia w Polsce</a>
-    </div>
-    <div class="content">
-      <div class="chart-container mt-4 mb-4">
-        <div class="chart-card">
-          <div class="chart-content">
-            <canvas width="800" height="400" id="lineChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-container mt-4 mb-4">
-        <div class="chart-card">
-          <div class="chart-content">
-            <canvas width="800" height="400" id="barChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-container mt-4 mb-4">
-        <div class="chart-card">
-          <div class="chart-content">
-            <canvas width="800" height="400" id="flatPricesChart"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="chart-container mt-4 mb-4">
-        <div class="chart-card">
-          <div class="chart-content">
-            <canvas width="800" height="400" id="flatPricesPointerChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const lineChartData = {
-      labels: {{ labelsForAveragePriceForM2 | safe }},
-    datasets: [{
-      label: "Średnia cena za 1 m2 lokali mieszkalnych",
-      data: {{ valuesForAveragePriceForM2 | safe }},
-      fill: false,
-      lineTension: 0.1,
-      borderColor: "rgb(75,192,192)",
-        }]
-      };
-
-    const lineChartConfig = {
-      type: 'line',
-      data: lineChartData,
-      options: {
-        responsive: false
-      }
-    };
-
-    const lineChart = new Chart(
-      document.getElementById('lineChart'),
-      lineChartConfig
-    );
-
-    const barChartData = {
-      labels: {{ labelsForMedianPriceForM2 | safe }},
-    datasets: [{
-      label: "Mediana cen za 1 m2 lokali mieszkalnych",
-      data: {{ valuesForMedianPriceForM2 | safe }},
-      fill: false,
-      lineTension: 0.1,
-      borderColor: "rgb(75,192,192)",
-        }]
-      };
-
-    const barChartconfig = {
-      type: 'bar',
-      data: barChartData,
-      options: {
-        responsive: false
-      }
-    };
-
-    const barChart = new Chart(
-      document.getElementById('barChart'),
-      barChartconfig
-    );
-
-    const flatPricesChartData = {
-      labels: {{ labelsForAveragePriceFlat | safe }},
-    datasets: [{
-      label: "Średnia cena lokalu mieszkalnego",
-      data: {{ valuesForAveragePriceFlat | safe }},
-      fill: true,
-      lineTension: 0.1,
-      borderColor: "rgb(75,192,192)",
-        }]
-      };
-
-    const flatPricesChartconfig = {
-      type: 'bar',
-      data: flatPricesChartData,
-      options: {
-        responsive: false
-      }
-    };
-
-    const flatPricesPointerChart = new Chart(
-      document.getElementById('flatPricesChart'),
-      flatPricesChartconfig
-    );
-
-    const ctx = document.getElementById('flatPricesPointerChart');
-
-    const myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: {{ labelsForAverageFlatPricesPointer | safe }},
-    datasets: [{
-      label: "Wskaźniki cen lokali mieszkalnych",
-      data: {{ valuesForAverageFlatPricesPointer | safe }},
-      fill: true,
-      borderWidth: 1,
+    <script>
+      const lineChartData = {
+        labels: {{ new_registered_label | safe }},
+      datasets: [{
+        label: "Nowo zarejestrowani bezrobotni (Miesięcznie)",
+        data: {{ new_registered_values | safe }},
+        fill: false,
+        lineTension: 0.1,
+        borderColor: "rgb(75,192,192)",
           }]
-        },
-    options: {
-      responsive: false
-    },
-      });
-  </script>
-</body>
+        };
 
+      const lineChartConfig = {
+        type: 'line',
+        data: lineChartData,
+        options: {
+          responsive: false
+        }
+      };
+
+      const lineChart = new Chart(
+        document.getElementById('lineChart'),
+        lineChartConfig
+      );
+
+      const barChartData = {
+        labels: {{ new_unregistered_label | safe }},
+      datasets: [{
+        label: "Nowo wyrejestrowani bezrobotni (Miesięcznie)",
+        data: {{ new_unregistered_values | safe }},
+        fill: false,
+        lineTension: 0.1,
+        borderColor: "rgb(75,192,192)",
+          }]
+        };
+
+      const barChartconfig = {
+        type: 'bar',
+        data: barChartData,
+        options: {
+          responsive: false
+        }
+      };
+
+      const barChart = new Chart(
+        document.getElementById('barChart'),
+        barChartconfig
+      );
+
+      const flatPricesChartData = {
+        labels: {{ registered_label | safe }},
+      datasets: [{
+        label: "Zarejestrowani bezrobotni (Miesięcznie)",
+        data: {{ registered_values | safe }},
+        fill: true,
+        lineTension: 0.1,
+        borderColor: "rgb(75,192,192)",
+          }]
+        };
+
+      const flatPricesChartconfig = {
+        type: 'bar',
+        data: flatPricesChartData,
+        options: {
+          responsive: false
+        }
+      };
+
+      const flatPricesPointerChart = new Chart(
+        document.getElementById('flatPricesChart'),
+        flatPricesChartconfig
+      );
+
+      const ctx = document.getElementById('flatPricesPointerChart');
+
+      const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: {{ general_situation_label | safe }},
+      datasets: [{
+        label: "Generalna sytuacja gospodarcza w polsce (Miesięcznie)",
+        data: {{ general_situation_values | safe }},
+        fill: true,
+        borderWidth: 1,
+            }]
+          },
+      options: {
+        responsive: false
+      },
+        });
+    </script>
+  </body>
 </html>

@@ -11,12 +11,23 @@ from flask import request
 app = Flask(__name__)
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+# Constants
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SECRET_KEY'] = 'thisisasecretkey'
+month_mapper = {
+    247: 1,
+    249: 3,
+    251: 5,
+    253: 7,
+    255: 9,
+    257: 11
+}
+BASE_URL = "https://api-dbw.stat.gov.pl/api/1.1.0/variable/variable-data-section"
 
 
 @login_manager.user_loader
@@ -57,29 +68,66 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Zaloguj')
 
 
-class ApiData(FlaskForm):
-    def getData(fromYear, toYear, idZmienna, idPrzekroj):
-        testPeroidAndPrice = []
-        testPeroidsCodes = [270, 271, 272, 273]
-        for years in range(fromYear,toYear+1):
-            for peroids in testPeroidsCodes:
-                URL = "https://api-dbw.stat.gov.pl/api/1.1.0/variable/variable-data-section?id-zmienna="+str(idZmienna)+"&id-przekroj="+str(idPrzekroj)+"&id-rok=" + \
-                str(years) + "&id-okres=" + str(peroids) + "&ile-na-stronie=50&numer-strony=0&lang=pl"
+class ApiClient(FlaskForm):
+    def __getData(from_year, to_year, id_variable, id_part):
+        test_periods = []
+
+        periods_codes = [247, 249, 251, 253, 255, 257]
+        for years in range(from_year, to_year+1):
+            for i, periods in enumerate(periods_codes):
+                URL = '{0}?id-zmienna={1}&id-przekroj={2}&id-rok={3}&id-okres={4}&ile-na-stronie=50&numer-strony=0&lang=pl'.format(BASE_URL, str(id_variable), str(id_part), str(years), str(periods))
+
                 string_json = requests.get(URL)
 
                 json = string_json.json()
-                data_object = json['data']
-                countOfValuesDefferentThanZero = 0
-                valueSum = 0
-                for u in data_object:
-                    valueSum += u["wartosc"]
-                    year = u["id-daty"]
-                    peroid = u["id-okres"]
-                    if u["wartosc"] != 0: countOfValuesDefferentThanZero += 1
+                response_data = json['data']
+                # To calculate average
+                data_records = 0
+                final_result = 0
+                # check records
+                for record in response_data:
+                    final_result = final_result + record["wartosc"]
+                    year = record["id-daty"]
+                    period = record["id-okres"]
+                    if record["wartosc"] != 0:
+                        data_records += 1
 
-                testPeroidAndPrice.append({'date': str(peroid % 10 + 1) + "kw. " + str(year),
-                                           'averagePrice': round(valueSum / countOfValuesDefferentThanZero)})
-        return testPeroidAndPrice
+                # append data
+                test_periods.append({'date': str(month_mapper[period]) + "." + str(year), 'average_value': round(final_result / data_records)})
+        return test_periods
+
+    def getNewRegistered(from_y, to_y):
+        data_of_new_registered_unemployed = ApiClient.__getData(from_y, to_y, 505, 16)
+        new_registered_label = []
+        new_registered_values = []
+        for rec in data_of_new_registered_unemployed:
+            new_registered_label.append(rec["date"])
+            new_registered_values.append(rec["average_value"])
+        return new_registered_label, new_registered_values
+    def getNewUnregistered(from_y, to_y):
+        data_of_new_unregistered_unemployed = ApiClient.__getData(from_y, to_y, 506, 16)
+        new_unregistered_label = []
+        new_unregistered_values = []
+        for rec in data_of_new_unregistered_unemployed:
+            new_unregistered_label.append(rec["date"])
+            new_unregistered_values.append(rec["average_value"])
+        return new_unregistered_label, new_unregistered_values
+    def getRegistered(from_y, to_y):
+        data_of_registered_unemployed = ApiClient.__getData(from_y, to_y, 507, 16)
+        registered_label = []
+        registered_values = []
+        for rec in data_of_registered_unemployed:
+            registered_label.append(rec["date"])
+            registered_values.append(rec["average_value"])
+        return registered_label, registered_values
+    def getGeneralSituation(from_y, to_y):
+        data_of_general_situation = ApiClient.__getData(int(from_y), int(to_y), 477, 16)
+        general_situation_label = []
+        general_situation_values = []
+        for rec in data_of_general_situation:
+            general_situation_label.append(rec["date"])
+            general_situation_values.append(rec["average_value"])
+        return general_situation_label, general_situation_values
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -92,57 +140,38 @@ def login():
                 return redirect(url_for('home'))
     return render_template('login.html', form=form)
 
-
-
-
 @app.route('/home', methods =["GET", "POST"])
 @login_required
 def home():
     if request.method == "POST":
-        fromYear = request.form['fromYear']
-        toYear = request.form['toYear']
+        from_y = request.form['from_year']
+        to_y = request.form['to_year']
     else:
-        fromYear = 2019
-        toYear = 2021
+        from_y = 2019
+        to_y = 2021
     user = current_user.username
 
-    dataForAveragePriceForM2 = ApiData.getData(int(fromYear), int(toYear), 309, 485)
-    labelsForAveragePriceForM2 = []
-    valuesForAveragePriceForM2 = []
-    for x in dataForAveragePriceForM2:
-        labelsForAveragePriceForM2.append(x["date"])
-        valuesForAveragePriceForM2.append(x["averagePrice"])
+    # bezrobotni nowo zarejestrowani
+    new_registered_label, new_registered_values = ApiClient.getNewRegistered(int(from_y), int(to_y))
 
-    dataForMedianPriceForM2 = ApiData.getData(int(fromYear), int(toYear), 307, 485)
-    labelsForMedianPriceForM2 = []
-    valuesForMedianPriceForM2 = []
-    for x in dataForMedianPriceForM2:
-        labelsForMedianPriceForM2.append(x["date"])
-        valuesForMedianPriceForM2.append(x["averagePrice"])
+    # bezrobotni wyrejestrowani
+    new_unregistered_label, new_unregistered_values = ApiClient.getNewUnregistered(int(from_y), int(to_y))
 
-    dataForAveragePriceForFlat = ApiData.getData(int(fromYear), int(toYear), 308, 485)
-    labelsForAveragePriceFlat = []
-    valuesForAveragePriceFlat = []
-    for x in dataForAveragePriceForFlat:
-        labelsForAveragePriceFlat.append(x["date"])
-        valuesForAveragePriceFlat.append(x["averagePrice"])
+    # bezrobotni zarejestrowani
+    registered_label, registered_values = ApiClient.getRegistered(int(from_y), int(to_y))
 
-    dataForPriceFlatPointer = ApiData.getData(int(fromYear), int(toYear), 310, 484)
-    labelsForAverageFlatPricesPointer = []
-    valuesForAverageFlatPricesPointer = []
-    for x in dataForPriceFlatPointer:
-        labelsForAverageFlatPricesPointer.append(x["date"])
-        valuesForAverageFlatPricesPointer.append(x["averagePrice"])
+    # zmiana ogólnej sytuacji gospodarczej
+    general_situation_label, general_situation_values = ApiClient.getGeneralSituation(int(from_y), int(to_y))
 
     return render_template('home.html',
-                           labelsForAveragePriceForM2=labelsForAveragePriceForM2,
-                           valuesForAveragePriceForM2=valuesForAveragePriceForM2,
-                           labelsForMedianPriceForM2=labelsForMedianPriceForM2,
-                           valuesForMedianPriceForM2=valuesForMedianPriceForM2,
-                           labelsForAveragePriceFlat=labelsForAveragePriceFlat,
-                           valuesForAveragePriceFlat=valuesForAveragePriceFlat,
-                           valuesForAverageFlatPricesPointer=valuesForAverageFlatPricesPointer,
-                           labelsForAverageFlatPricesPointer=labelsForAverageFlatPricesPointer,
+                           new_registered_label=new_registered_label,
+                           new_registered_values=new_registered_values,
+                           new_unregistered_label=new_unregistered_label,
+                           new_unregistered_values=new_unregistered_values,
+                           registered_label=registered_label,
+                           registered_values=registered_values,
+                           general_situation_values=general_situation_values,
+                           general_situation_label=general_situation_label,
                            user=user)
 
 
